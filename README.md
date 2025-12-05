@@ -1,59 +1,160 @@
-# Angular21Zoneless
+# Angular 21 Zoneless Demo
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.1.
+> Demostración de las nuevas APIs de Angular 21 con **Zoneless Change Detection**
 
-## Development server
+Este proyecto es un playground para experimentar con las características más importantes de Angular 21, especialmente el modo **zoneless** que elimina Zone.js completamente.
 
-To start a local development server, run:
+## Features Demostrados
 
-```bash
-ng serve
+### 1. Signal Inputs + Computed Signals
+
+El componente `UserAvatar` demuestra el nuevo estándar de inputs:
+
+```typescript
+// Signal Input requerido
+userId = input.required<string>();
+
+// Signal Input opcional con valor por defecto
+size = input<'sm' | 'md' | 'lg'>('md');
+
+// Computed Signal: Se recalcula automáticamente
+avatarUrl = computed(() => `https://api.dicebear.com/7.x/avataaars/svg?seed=${this.userId()}`);
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+**Beneficios:**
+- Sin `ngOnChanges`, sin lifecycle hooks manuales
+- Cero subscriptions, cero memory leaks
+- Type-safe por defecto
 
-## Code scaffolding
+### 2. Resource API
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+El componente `UserProfile` demuestra la nueva API de recursos para datos asíncronos:
 
-```bash
-ng generate component component-name
+```typescript
+userProfile = resource({
+  params: () => ({ id: this.userId() }),
+  loader: async ({ params }) => {
+    const response = await fetch(`https://jsonplaceholder.typicode.com/users/${params.id}`);
+    return response.json() as Promise<UserData>;
+  }
+});
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+**Beneficios:**
+- Manejo automático de loading, error y cancelación
+- Re-fetch automático cuando cambian las dependencias
+- Sin `subscribe()`, sin `takeUntil()`, sin quilombos
 
-```bash
-ng generate --help
+### 3. Linked Signals
+
+El componente `QuantitySelector` demuestra `linkedSignal`:
+
+```typescript
+// Input desde el padre
+initialQty = input<number>(1);
+resetTrigger = input<number>(0);
+
+// Linked Signal: Escucha al input pero permite mutación local
+quantity = linkedSignal(() => {
+  this.resetTrigger(); // Fuerza re-evaluación
+  return this.initialQty();
+});
+
+increment() {
+  this.quantity.update(q => q + 1); // Mutación local sin romper el flujo
+}
 ```
 
-## Building
+**Beneficios:**
+- Estado local derivado de props sin perder reactividad
+- Reset automático cuando el padre cambia los inputs
+- Patrón perfecto para forms y controles editables
 
-To build the project run:
+## Zoneless Change Detection
 
-```bash
-ng build
+Este proyecto usa `provideZonelessChangeDetection()` en lugar de Zone.js:
+
+```typescript
+// app.config.ts
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideRouter(routes),
+    provideZonelessChangeDetection(), // No más Zone.js
+  ],
+};
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+**¿Por qué Zoneless?**
+- Bundle size más pequeño (~15KB menos)
+- Mejor performance (sin monkey-patching de APIs del browser)
+- Change detection más predecible y explícito
+- Mejor debugging (stack traces limpios)
 
-## Running unit tests
+## Requisitos
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+- **Node.js** 20+
+- **Bun** 1.2+ (package manager)
+
+## Instalación
 
 ```bash
-ng test
+# Clonar el repositorio
+git clone https://github.com/Alan-TheGentleman/angular21-zoneless.git
+cd angular21-zoneless
+
+# Instalar dependencias
+bun install
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+## Scripts
 
 ```bash
-ng e2e
+# Development server
+bun start
+
+# Build de producción
+bun run build
+
+# Ejecutar tests
+bun test
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Estructura del Proyecto
 
-## Additional Resources
+```
+src/app/
+├── components/
+│   ├── quantity-selector/   # Demo: Linked Signals
+│   ├── user-avatar/         # Demo: Signal Inputs + Computed
+│   └── user-profile/        # Demo: Resource API
+├── pages/
+│   └── demo/                # Página de demostración interactiva
+├── app.config.ts            # Configuración zoneless
+└── app.routes.ts
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Stack Técnico
+
+| Tecnología | Versión |
+|------------|---------|
+| Angular | 21.0.0 |
+| TypeScript | 5.9.2 |
+| Bun | 1.2.21 |
+| Vitest | 4.0.8 |
+| SCSS | - |
+
+## Links Útiles
+
+- [Angular 21 Release Notes](https://blog.angular.dev/)
+- [Signal Inputs RFC](https://github.com/angular/angular/discussions/49682)
+- [Resource API RFC](https://github.com/angular/angular/discussions/58510)
+- [Zoneless Change Detection](https://angular.dev/guide/experimental/zoneless)
+
+## Autor
+
+**Alan Buscaglia** - [@AlanThGentleman](https://twitter.com/AlanThGentleman)
+
+---
+
+> *"Angular 21 es el Angular que siempre debió existir. Signals + Zoneless = Frontend sin quilombos."*

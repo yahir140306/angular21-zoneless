@@ -1,0 +1,28 @@
+<div class="profile-card">
+  <!-- Estado: Cargando -->
+  @if (userProfile.isLoading()) {
+    <div class="skeleton">
+      <div class="skeleton-avatar"></div>
+      <div class="skeleton-text"></div>
+      <div class="skeleton-text short"></div>
+    </div>
+  }
+
+  <!-- Estado: Error -->
+  @if (userProfile.error()) {
+    <div class="error-state">
+      <span class="error-icon">!</span>
+      <p>{{ userProfile.error() }}</p>
+      <button (click)="userProfile.reload()">Reintentar</button>
+    </div>
+  }
+
+  <!-- Estado: Datos cargados -->
+  @if (userProfile.hasValue()) {
+    <div class="profile-content">
+      <h2>{{ userName() }}</h2>
+      <p class="email">{{ userEmail() }}</p>
+      <p class="company">{{ userCompany() }}</p>
+    </div>
+  }
+</div>

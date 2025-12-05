@@ -1,0 +1,113 @@
+<div class="demo-container">
+  <header class="demo-header">
+    <h1>Angular 21 <span class="highlight">Zoneless</span></h1>
+    <p class="subtitle">Demos de Fine-Grained Reactivity</p>
+  </header>
+
+  <!-- DEMO 1: Signal Inputs + Computed -->
+  <section class="demo-section">
+    <div class="section-header">
+      <span class="demo-number">01</span>
+      <h2>Signal Inputs + Computed</h2>
+    </div>
+    <p class="description">
+      Olvidate del decorador <code>&#64;Input()</code>. Ahora usamos <code>input()</code> 
+      y <code>computed()</code> para reactividad automática.
+    </p>
+    
+    <div class="demo-content">
+      <div class="demo-preview">
+        <app-user-avatar [userId]="currentUserId()" size="lg" />
+        <p class="current-value">userId: {{ currentUserId() }}</p>
+      </div>
+      <div class="demo-actions">
+        <button (click)="changeUser()">Cambiar Usuario</button>
+      </div>
+    </div>
+
+    <div class="code-snippet">
+      <pre><code>// Signal Input requerido
+userId = input.required&lt;string&gt;();
+
+// Computed: se recalcula automáticamente
+avatarUrl = computed(() =&gt; 
+  `https://api.cdn.com/$&#123;this.userId()&#125;/avatar`
+);</code></pre>
+    </div>
+  </section>
+
+  <!-- DEMO 2: Resource API -->
+  <section class="demo-section">
+    <div class="section-header">
+      <span class="demo-number">02</span>
+      <h2>Resource API</h2>
+    </div>
+    <p class="description">
+      Gestión de estado asíncrono con <code>resource()</code>. 
+      Loading, error y cancelación automática. Sin memory leaks.
+    </p>
+    
+    <div class="demo-content">
+      <div class="demo-preview">
+        <app-user-profile [userId]="currentUserIdNum()" />
+      </div>
+      <div class="demo-actions">
+        <button (click)="changeUserProfile()">Cargar Otro Usuario</button>
+        <span class="hint">User ID: {{ currentUserIdNum() }}</span>
+      </div>
+    </div>
+
+    <div class="code-snippet">
+      <pre><code>userProfile = resource(&#123;
+  request: () =&gt; this.userId(),
+  loader: async (&#123; request &#125;) =&gt; &#123;
+    const res = await fetch(`/api/users/$&#123;request&#125;`);
+    return res.json();
+  &#125;
+&#125;);</code></pre>
+    </div>
+  </section>
+
+  <!-- DEMO 3: Linked Signals -->
+  <section class="demo-section">
+    <div class="section-header">
+      <span class="demo-number">03</span>
+      <h2>Linked Signals</h2>
+    </div>
+    <p class="description">
+      <code>linkedSignal()</code> crea una señal local que escucha al input.
+      Si el padre cambia el valor, se resetea automáticamente.
+    </p>
+    
+    <div class="demo-content">
+      <div class="demo-preview">
+        <app-quantity-selector 
+          [initialQty]="initialQuantity()" 
+          [resetTrigger]="resetTrigger()"
+          [max]="10"
+          (quantityChange)="onQuantityChange($event)"
+        />
+        <p class="current-value">initialQty desde padre: {{ initialQuantity() }}</p>
+      </div>
+      <div class="demo-actions">
+        <button (click)="resetQuantity()">Reset desde Padre</button>
+        <span class="hint">Modifica localmente, luego resetea</span>
+      </div>
+    </div>
+
+    <div class="code-snippet">
+      <pre><code>initialQty = input(1);
+
+// linkedSignal: escucha al input, permite mutación local
+quantity = linkedSignal(() =&gt; this.initialQty());
+
+updateQty() &#123;
+  this.quantity.update(q =&gt; q + 1); // Mutación local segura
+&#125;</code></pre>
+    </div>
+  </section>
+
+  <footer class="demo-footer">
+    <p>Angular 21 - Sin Zone.js - Fine-Grained Reactivity</p>
+  </footer>
+</div>

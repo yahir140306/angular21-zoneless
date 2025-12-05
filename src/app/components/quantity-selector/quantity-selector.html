@@ -1,0 +1,29 @@
+<div class="quantity-selector">
+  <button 
+    class="qty-btn decrement"
+    (click)="decrement()"
+    [disabled]="quantity() <= min()"
+    aria-label="Decrementar cantidad"
+  >
+    −
+  </button>
+  
+  <input
+    type="number"
+    class="qty-input"
+    [value]="quantity()"
+    [min]="min()"
+    [max]="max()"
+    (change)="setQuantity($event)"
+    aria-label="Cantidad"
+  />
+  
+  <button 
+    class="qty-btn increment"
+    (click)="increment()"
+    [disabled]="quantity() >= max()"
+    aria-label="Incrementar cantidad"
+  >
+    +
+  </button>
+</div>

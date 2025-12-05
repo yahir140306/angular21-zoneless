@@ -1,0 +1,73 @@
+.profile-card {
+  background: #1a1a2e;
+  border-radius: 12px;
+  padding: 1.5rem;
+  min-width: 280px;
+  color: #eee;
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, #2a2a4a 25%, #3a3a5a 50%, #2a2a4a 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  &-text {
+    height: 1rem;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #2a2a4a 25%, #3a3a5a 50%, #2a2a4a 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+
+    &.short { width: 60%; }
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.error-state {
+  text-align: center;
+  color: #ff6b6b;
+
+  .error-icon { font-size: 2rem; }
+  
+  button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    
+    &:hover { background: #ff5252; }
+  }
+}
+
+.profile-content {
+  h2 {
+    margin: 0 0 0.5rem;
+    color: #fff;
+  }
+
+  .email {
+    color: #888;
+    font-size: 0.9rem;
+  }
+
+  .company {
+    color: #667eea;
+    font-weight: 500;
+  }
+}
